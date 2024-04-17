@@ -1,5 +1,5 @@
 # Run Project
-npm run deb
+npm run dev
 
 # Build Project
 npm run build
