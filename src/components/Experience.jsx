@@ -8,17 +8,18 @@ import { useMemo } from "react";
 import { Group } from 'three';
 import * as THREE from "three"
 import { useFrame } from "@react-three/fiber";
+import TextSection from './TextSection';
 
 const LINE_NB_POINTS = 1000;
 const CURVE_DISTANCE = 250;
 const CURVE_AHEAD_CAMERA = 0.008;
 const CURVE_AHEAD_AIRPLANE = 0.02;
 const AIRPLANE_MAX_ANGLE = 45;
+const FRICTION_DISTANCE = 42;
 
 export const Experience = () => {
 
-  const curve = useMemo(() => {
-    return new THREE.CatmullRomCurve3([
+  const curvePoints = useMemo(() => [
       new THREE.Vector3(0, 0, 0),
       new THREE.Vector3(0, 0, -CURVE_DISTANCE),
       new THREE.Vector3(100, 0, -2 * CURVE_DISTANCE),
@@ -27,7 +28,11 @@ export const Experience = () => {
       new THREE.Vector3(5, 0, -5 * CURVE_DISTANCE),
       new THREE.Vector3(7, 0, -6 * CURVE_DISTANCE),
       new THREE.Vector3(0, 0, -7 * CURVE_DISTANCE),
-    ],
+  ], [])
+
+  const curve = useMemo(() => {
+    return new THREE.CatmullRomCurve3(
+      curvePoints,
     false,
     "catmullrom",
     0.5)
@@ -46,23 +51,115 @@ export const Experience = () => {
   }, [curve]);
 
   const cameraGroup = useRef();
+  const cameraRail = useRef();
+  const lastScroll = useRef(0);
   const scroll = useScroll();
 
+  const textSections = useMemo(() => {
+    return [
+      // {
+      //   position: new THREE.Vector3(
+      //     curvePoints[1].x - 3,
+      //     curvePoints[1].y,
+      //     curvePoints[1].z
+      //   ),
+      //   title: `SEWP WORLD HQ
+      //   Home of the Government's Premier IT Contract`
+      // },
+      {
+        cameraRailDist: 1.5,
+        position: new THREE.Vector3(
+          curvePoints[1].x + 2,
+          curvePoints[1].y,
+          curvePoints[1].z
+        ),
+        title: `Training & Events`,
+        subtitle: `Visit Site`,
+      },
+      {
+        cameraRailDist: -1,
+        position: new THREE.Vector3(
+          curvePoints[2].x - 3,
+          curvePoints[2].y,
+          curvePoints[2].z
+        ),
+        title: `Storefront & Aquisition Tools`,
+        subtitle: `Visit Site`,
+      },
+      {
+        cameraRailDist: 1.5,
+        position: new THREE.Vector3(
+          curvePoints[3].x + 2,
+          curvePoints[3].y,
+          curvePoints[3].z
+        ),
+        title: `Contract Holders & Industry Providers`,
+        subtitle: `Visit Site`,
+      },
+      {
+        cameraRailDist: 1.5,
+        position: new THREE.Vector3(
+          curvePoints[4].x + 2,
+          curvePoints[4].y,
+          curvePoints[4].z
+        ),
+        title: `About SEWP`,
+        subtitle: `Visit Site`,
+      },
+      {
+        cameraRailDist: 1.5,
+        position: new THREE.Vector3(
+          curvePoints[5].x + 2,
+          curvePoints[5].y,
+          curvePoints[5].z
+        ),
+        title: `Procurement Policy & Regulation`,
+        subtitle: `Visit Site`,
+      },
+    ]
+  })
+
   useFrame((_state, delta) => {
-    // const curPointIndex = Math.min(
-    //   Math.round(scroll.offset * linePoints.length),
-    //   linePoints.length - 1
-    // )
 
     const scrollOffset = Math.max(0, scroll.offset)
 
-    const curPoint = curve.getPoint(scrollOffset);
+    let friction = 1;
+    let resetCameraRail = true;
+    // separate scroll sections
+    textSections.forEach((textSection) => {
+      const distance = textSection.position.distanceTo(cameraGroup.current.position);
+
+      if(distance < FRICTION_DISTANCE) {
+        friction = Math.max(distance / FRICTION_DISTANCE, 0.1);
+        const targetCameraRailPosition = new THREE.Vector3(
+          (1 - distance / FRICTION_DISTANCE) * textSection.cameraRailDist,
+          0,
+          0,
+        )
+        cameraRail.current.position.lerp(targetCameraRailPosition, delta);
+        resetCameraRail = false;
+      }
+    });
+
+    if(resetCameraRail) {
+      const targetCameraRailPosition = new THREE.Vector3(0, 0, 0);
+      cameraRail.current.position.lerp(targetCameraRailPosition, delta);
+    }
+
+    // Calculate lerped scroll offset
+    let lerpedScrollOffset = THREE.MathUtils.lerp(lastScroll.current, scrollOffset, delta * friction);
+    lerpedScrollOffset = Math.min(lerpedScrollOffset, 1);
+    lerpedScrollOffset = Math.max(lerpedScrollOffset, 0);
+
+    lastScroll.current = lerpedScrollOffset;
+
+    const curPoint = curve.getPoint(lerpedScrollOffset);
 
     // Follow curve points
     cameraGroup.current.position.lerp(curPoint, delta * 24)
 
     //Make group look ahead of curve
-    const lookAtPoint = curve.getPoint(Math.min(scrollOffset + CURVE_AHEAD_CAMERA, 1));
+    const lookAtPoint = curve.getPoint(Math.min(lerpedScrollOffset + CURVE_AHEAD_CAMERA, 1));
 
     const currentLookAt = cameraGroup.current.getWorldDirection(
       new THREE.Vector3()
@@ -78,7 +175,7 @@ export const Experience = () => {
     )
 
     // Airplane rotation
-    const tangent = curve.getTangent(scrollOffset + CURVE_AHEAD_AIRPLANE);
+    const tangent = curve.getTangent(lerpedScrollOffset + CURVE_AHEAD_AIRPLANE);
 
     const nonLerpLookAt = new Group();
     nonLerpLookAt.position.copy(curPoint)
@@ -133,7 +230,9 @@ export const Experience = () => {
       {/* <OrbitControls enableZoom={false} /> */}
       <group ref={cameraGroup}>
         <Background />
-        <PerspectiveCamera position={[0, 0, 5]} fov={30} makeDefault />
+        <group ref={cameraRail}>
+          <PerspectiveCamera position={[0, 0, 5]} fov={30} makeDefault />
+        </group>
         <group ref={airplane}>
           <Float floatIntensity={1} speed={1.5} rotationIntensity={0.5}>
             <Airplane 
@@ -145,7 +244,7 @@ export const Experience = () => {
           </Float>
         </group>
       </group>
-      
+
       {/* TEXT */}
 
       <group position={[0.5, 0, -3]}>
@@ -161,30 +260,9 @@ export const Experience = () => {
         </Text>
       </group>
 
-      <group position={[-5, 0, -100]}>
-        <Text
-          color="white"
-          anchorX={"left"}
-          anchorY={"middle"}
-          fontSize={0.22}
-          maxWidth={2.5}
-        >
-          Training & Events {"\n"}
-          
-          
-        </Text>
-        <Text
-          color="white"
-          anchorX={"left"}
-          anchorY={"top"}
-          position-y={-0.26}
-          fontSize={0.22}
-          maxWidth={2.5}
-        >
-          Visit Site
-        </Text>
-      </group>
-      
+      {textSections.map((textSection, index) => (
+        <TextSection {...textSection} key={index} />
+      ))}
       
       {/* LINE */}
 
