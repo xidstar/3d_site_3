@@ -10,6 +10,7 @@ import * as THREE from "three"
 import { useFrame } from "@react-three/fiber";
 import TextSection from './TextSection';
 import gsap from "gsap";
+import { fadeOnBeforeCompile } from "../utils/fadeMaterial";
 
 
 const LINE_NB_POINTS = 1000;
@@ -44,6 +45,192 @@ export const Experience = () => {
     return curve.getPoints(LINE_NB_POINTS)
   }, [curve])
 
+  const clouds = useMemo(
+    () => [
+      // STARTING
+      
+      {
+        position: new THREE.Vector3(3.5, -6, -10),
+      },
+      {
+        scale: new THREE.Vector3(2, 2, 2),
+        position: new THREE.Vector3(-18, 0.2, -68),
+        rotation: new THREE.Euler(-Math.PI / 5, Math.PI / 6, 0),
+      },
+      // FIRST POINT
+      // {
+      //   scale: new THREE.Vector3(2, 2, 2),
+      //   position: new THREE.Vector3(
+      //     curvePoints[1].x + 10,
+      //     curvePoints[1].y - 4,
+      //     curvePoints[1].z + 64
+      //   ),
+      // },
+      {
+        scale: new THREE.Vector3(1.5, 1.5, 1.5),
+        position: new THREE.Vector3(
+          curvePoints[1].x - 20,
+          curvePoints[1].y + 4,
+          curvePoints[1].z + 28
+        ),
+        rotation: new THREE.Euler(0, Math.PI / 7, 0),
+      },
+      {
+        rotation: new THREE.Euler(0, Math.PI / 7, Math.PI / 5),
+        scale: new THREE.Vector3(2.5, 2.5, 2.5),
+        position: new THREE.Vector3(
+          curvePoints[1].x - 13,
+          curvePoints[1].y + 4,
+          curvePoints[1].z - 62
+        ),
+      },
+      {
+        rotation: new THREE.Euler(Math.PI / 2, Math.PI / 2, Math.PI / 3),
+        scale: new THREE.Vector3(2.5, 2.5, 2.5),
+        position: new THREE.Vector3(
+          curvePoints[1].x + 54,
+          curvePoints[1].y + 2,
+          curvePoints[1].z - 82
+        ),
+      },
+      {
+        scale: new THREE.Vector3(2.5, 2.5, 2.5),
+        position: new THREE.Vector3(
+          curvePoints[1].x + 8,
+          curvePoints[1].y - 14,
+          curvePoints[1].z - 22
+        ),
+      },
+      // SECOND POINT
+      {
+        scale: new THREE.Vector3(3, 3, 3),
+        position: new THREE.Vector3(
+          curvePoints[2].x + 6,
+          curvePoints[2].y - 7,
+          curvePoints[2].z + 50
+        ),
+      },
+      {
+        scale: new THREE.Vector3(2, 2, 2),
+        position: new THREE.Vector3(
+          curvePoints[2].x - 2,
+          curvePoints[2].y + 4,
+          curvePoints[2].z - 26
+        ),
+      },
+      {
+        scale: new THREE.Vector3(4, 4, 4),
+        position: new THREE.Vector3(
+          curvePoints[2].x + 12,
+          curvePoints[2].y + 1,
+          curvePoints[2].z - 86
+        ),
+        rotation: new THREE.Euler(Math.PI / 4, 0, Math.PI / 3),
+      },
+      // THIRD POINT
+      {
+        scale: new THREE.Vector3(3, 3, 3),
+        position: new THREE.Vector3(
+          curvePoints[3].x + 3,
+          curvePoints[3].y - 10,
+          curvePoints[3].z + 50
+        ),
+      },
+      {
+        scale: new THREE.Vector3(3, 3, 3),
+        position: new THREE.Vector3(
+          curvePoints[3].x - 10,
+          curvePoints[3].y,
+          curvePoints[3].z + 30
+        ),
+        rotation: new THREE.Euler(Math.PI / 4, 0, Math.PI / 5),
+      },
+      {
+        scale: new THREE.Vector3(4, 4, 4),
+        position: new THREE.Vector3(
+          curvePoints[3].x - 20,
+          curvePoints[3].y - 5,
+          curvePoints[3].z - 8
+        ),
+        rotation: new THREE.Euler(Math.PI, 0, Math.PI / 5),
+      },
+      // {
+      //   scale: new THREE.Vector3(5, 5, 5),
+      //   position: new THREE.Vector3(
+      //     curvePoints[3].x + 0,
+      //     curvePoints[3].y - 5,
+      //     curvePoints[3].z - 98
+      //   ),
+      //   rotation: new THREE.Euler(0, Math.PI / 3, 0),
+      // },
+      // FOURTH POINT
+      {
+        scale: new THREE.Vector3(2, 2, 2),
+        position: new THREE.Vector3(
+          curvePoints[4].x + 3,
+          curvePoints[4].y - 10,
+          curvePoints[4].z + 2
+        ),
+      },
+      {
+        scale: new THREE.Vector3(3, 3, 3),
+        position: new THREE.Vector3(
+          curvePoints[4].x + 14,
+          curvePoints[4].y + 20,
+          curvePoints[4].z - 42
+        ),
+        rotation: new THREE.Euler(Math.PI / 4, 0, Math.PI / 5),
+      },
+      {
+        scale: new THREE.Vector3(3, 3, 3),
+        position: new THREE.Vector3(
+          curvePoints[4].x - 4,
+          curvePoints[4].y + 9,
+          curvePoints[4].z - 62
+        ),
+        rotation: new THREE.Euler(Math.PI / 3, 0, Math.PI / 3),
+      },
+      // FINAL
+      {
+        scale: new THREE.Vector3(2, 2, 2),
+        position: new THREE.Vector3(
+          curvePoints[7].x - 10,
+          curvePoints[7].y - 5,
+          curvePoints[7].z + 500
+        ),
+        rotation: new THREE.Euler(-Math.PI / 4, -Math.PI / 6, 0),
+      },
+      {
+        scale: new THREE.Vector3(2, 2, 2),
+        position: new THREE.Vector3(
+          curvePoints[7].x + 10,
+          curvePoints[7].y - 15,
+          curvePoints[7].z + 480
+        ),
+        rotation: new THREE.Euler(-Math.PI / 4, -Math.PI / 6, 0),
+      },
+      {
+        scale: new THREE.Vector3(3, 3, 3),
+        position: new THREE.Vector3(
+          curvePoints[7].x - 10,
+          curvePoints[7].y - 0,
+          curvePoints[7].z + 200
+        ),
+        rotation: new THREE.Euler(Math.PI / 4, Math.PI / 6, 0),
+      },
+      {
+        scale: new THREE.Vector3(4, 4, 4),
+        position: new THREE.Vector3(
+          curvePoints[7].x,
+          curvePoints[7].y,
+          curvePoints[7].z - 22,
+        ),
+        rotation: new THREE.Euler(0, 0, 0),
+      },
+    ],
+    []
+  );
+
   const shape = useMemo(() => {
     const shape = new THREE.Shape();
     shape.moveTo(0, -0.08);
@@ -77,7 +264,7 @@ export const Experience = () => {
           curvePoints[1].z
         ),
         title: `Training & Events`,
-        subtitle: `Visit Site`,
+        subtitle: `- Visit Site -`,
       },
       {
         cameraRailDist: -1,
@@ -87,7 +274,7 @@ export const Experience = () => {
           curvePoints[2].z
         ),
         title: `Storefront & Aquisition Tools`,
-        subtitle: `Visit Site`,
+        subtitle: `- Visit Site -`,
       },
       {
         cameraRailDist: 1.5,
@@ -97,7 +284,7 @@ export const Experience = () => {
           curvePoints[3].z
         ),
         title: `Contract Holders & Industry Providers`,
-        subtitle: `Visit Site`,
+        subtitle: `- Visit Site -`,
       },
       {
         cameraRailDist: 1.5,
@@ -107,7 +294,7 @@ export const Experience = () => {
           curvePoints[4].z
         ),
         title: `About SEWP`,
-        subtitle: `Visit Site`,
+        subtitle: `- Visit Site -`,
       },
       {
         cameraRailDist: 1.5,
@@ -117,7 +304,7 @@ export const Experience = () => {
           curvePoints[5].z
         ),
         title: `Procurement Policy & Regulation`,
-        subtitle: `Visit Site`,
+        subtitle: `- Visit Site -`,
       },
     ]
   })
@@ -226,7 +413,7 @@ export const Experience = () => {
 
   const backgroundColors = useRef({
     colorA: "#3535cc",
-    colorB: "abaadd",
+    colorB: "#abaadd",
   })
 
   useLayoutEffect(() => {
@@ -235,19 +422,19 @@ export const Experience = () => {
     tl.current.to(backgroundColors.current, {
       duration: 1,
       colorA: "#6f35cc",
-      colorB: "ffad30",
-    }),
-
-    tl.current.to(backgroundColors.current, {
-      duration: 1,
-      colorA: "#424242",
-      colorB: "ffcc00",
+      colorB: "#ffad30",
     }),
 
     tl.current.to(backgroundColors.current, {
       duration: 1,
       colorA: "#81318b",
-      colorB: "55ab8f",
+      colorB: "#ffcc00",
+    }),
+
+    tl.current.to(backgroundColors.current, {
+      duration: 1,
+      colorA: "#6f35cc",
+      colorB: "#cccccc",
     }),
 
     tl.current.pause()
@@ -255,7 +442,7 @@ export const Experience = () => {
 
   return (
     <>
-      <directionalLight position={[0, 3, 1]} intensity={0.1} />
+      <directionalLight position={[0, 3, 1]} intensity={0.5} />
 
       {/* PLANE/DUCK */}
 
@@ -322,34 +509,16 @@ export const Experience = () => {
             opacity={1}
             transparent 
             envMapIntensity={2}
+            onBeforeCompile={fadeOnBeforeCompile}
           />
         </mesh>
       </group>
       
       {/* CLOUDS */}
 
-      <Cloud 
-        scale={[1, 1, 1]}
-        rotation-y={Math.PI / 3}
-        position={[-3.5, 0.5, -12]}
-      />
-      {/* <Cloud 
-        scale={[1, 1, 1]}
-        position={[3.5, 0.2, -12]}
-      /> */}
-      <Cloud 
-        scale={[0.4, 0.4, 0.4]}
-        rotation-y={Math.PI / 9}
-        position={[0, 0, -32]}
-      />
-      <Cloud 
-        scale={[0.3, 0.5, 2]}
-        position={[9, -0.5, -63]}
-      />
-      <Cloud 
-        scale={[0.8, 0.8, 0.8]}
-        position={[-2, -1, -90]}
-      />
+      {clouds.map((cloud, index) => (
+        <Cloud {...cloud} key={index} />
+      ))}
     </>
   );
 };
