@@ -1,4 +1,4 @@
-import React, {useRef} from 'react'
+import React, {useLayoutEffect, useRef} from 'react'
 import { Float, Line, OrbitControls, PerspectiveCamera, Text, useScroll } from "@react-three/drei";
 import Background from "./Background";
 import Airplane from "./Airplane";
@@ -9,6 +9,8 @@ import { Group } from 'three';
 import * as THREE from "three"
 import { useFrame } from "@react-three/fiber";
 import TextSection from './TextSection';
+import gsap from "gsap";
+
 
 const LINE_NB_POINTS = 1000;
 const CURVE_DISTANCE = 250;
@@ -49,6 +51,7 @@ export const Experience = () => {
 
     return shape;
   }, [curve]);
+
 
   const cameraGroup = useRef();
   const cameraRail = useRef();
@@ -152,6 +155,7 @@ export const Experience = () => {
     lerpedScrollOffset = Math.max(lerpedScrollOffset, 0);
 
     lastScroll.current = lerpedScrollOffset;
+    tl.current.seek(lerpedScrollOffset * tl.current.duration());
 
     const curPoint = curve.getPoint(lerpedScrollOffset);
 
@@ -216,10 +220,38 @@ export const Experience = () => {
     airplane.current.quaternion.slerp(targetAirplaneQuaternion, delta * 2)
   });
 
- 
-
+  const tl = useRef();
 
   const airplane = useRef();
+
+  const backgroundColors = useRef({
+    colorA: "#3535cc",
+    colorB: "abaadd",
+  })
+
+  useLayoutEffect(() => {
+    tl.current = gsap.timeline();
+
+    tl.current.to(backgroundColors.current, {
+      duration: 1,
+      colorA: "#6f35cc",
+      colorB: "ffad30",
+    }),
+
+    tl.current.to(backgroundColors.current, {
+      duration: 1,
+      colorA: "#424242",
+      colorB: "ffcc00",
+    }),
+
+    tl.current.to(backgroundColors.current, {
+      duration: 1,
+      colorA: "#81318b",
+      colorB: "55ab8f",
+    }),
+
+    tl.current.pause()
+  }, [])
 
   return (
     <>
@@ -229,7 +261,7 @@ export const Experience = () => {
 
       {/* <OrbitControls enableZoom={false} /> */}
       <group ref={cameraGroup}>
-        <Background />
+        <Background backgroundColors={backgroundColors}/>
         <group ref={cameraRail}>
           <PerspectiveCamera position={[0, 0, 5]} fov={30} makeDefault />
         </group>
