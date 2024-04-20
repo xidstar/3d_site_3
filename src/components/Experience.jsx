@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useRef} from 'react'
+import React, {useLayoutEffect, useRef, useEffect, useState} from 'react';
 import { Float, Line, OrbitControls, PerspectiveCamera, Text, useScroll } from "@react-three/drei";
 import Background from "./Background";
 import Airplane from "./Airplane";
@@ -11,6 +11,10 @@ import { useFrame } from "@react-three/fiber";
 import TextSection from './TextSection';
 import gsap from "gsap";
 import { fadeOnBeforeCompile } from "../utils/fadeMaterial";
+import { useSnapshot } from "valtio";
+
+import state from "../store";
+import Outro from './Outro';
 
 
 const LINE_NB_POINTS = 1000;
@@ -21,6 +25,8 @@ const AIRPLANE_MAX_ANGLE = 45;
 const FRICTION_DISTANCE = 42;
 
 export const Experience = () => {
+  const snap = useSnapshot(state);
+  const [play, setPlay] = useState(false);
 
   const curvePoints = useMemo(() => [
       new THREE.Vector3(0, 0, 0),
@@ -214,15 +220,15 @@ export const Experience = () => {
         position: new THREE.Vector3(
           curvePoints[7].x - 10,
           curvePoints[7].y - 0,
-          curvePoints[7].z + 200
+          curvePoints[7].z + 150
         ),
         rotation: new THREE.Euler(Math.PI / 4, Math.PI / 6, 0),
       },
       {
         scale: new THREE.Vector3(4, 4, 4),
         position: new THREE.Vector3(
-          curvePoints[7].x,
-          curvePoints[7].y,
+          curvePoints[7].x + 3,
+          curvePoints[7].y -5,
           curvePoints[7].z - 22,
         ),
         rotation: new THREE.Euler(0, 0, 0),
@@ -312,6 +318,16 @@ export const Experience = () => {
   useFrame((_state, delta) => {
 
     const scrollOffset = Math.max(0, scroll.offset)
+
+    if(snap.isEnd) {
+      state.isEnd = true;
+      <Outro />
+      
+      return;
+      
+    }
+
+    
 
     let friction = 1;
     let resetCameraRail = true;
@@ -404,7 +420,15 @@ export const Experience = () => {
       
     )
 
-    airplane.current.quaternion.slerp(targetAirplaneQuaternion, delta * 2)
+    airplane.current.quaternion.slerp(targetAirplaneQuaternion, delta * 2);
+
+    if (
+      cameraGroup.current.position.z <
+      curvePoints[curvePoints.length - 1].z + 100
+    ) {
+      state.isEnd = true;
+      planeOutTl.current.play();
+    }
   });
 
   const tl = useRef();
@@ -415,6 +439,9 @@ export const Experience = () => {
     colorA: "#3535cc",
     colorB: "#abaadd",
   })
+
+  const planeInTl = useRef();
+  const planeOutTl = useRef();
 
   useLayoutEffect(() => {
     tl.current = gsap.timeline();
@@ -437,14 +464,63 @@ export const Experience = () => {
       colorB: "#cccccc",
     }),
 
-    tl.current.pause()
+    tl.current.pause();
+
+    planeInTl.current = gsap.timeline();
+    planeInTl.current.pause();
+    planeInTl.current.from(airplane.current.position, {
+      duration: 3,
+      z: 5,
+      y: -2,
+    });
+
+    planeOutTl.current = gsap.timeline();
+    planeOutTl.current.pause();
+
+    planeOutTl.current.to(
+      airplane.current.position,
+      {
+        duration: 10,
+        z: -250,
+        y: 10,
+      },
+      0
+    );
+    planeOutTl.current.to(
+      cameraRail.current.position,
+      {
+        duration: 8,
+        y: 12,
+      },
+      0
+    );
+    planeOutTl.current.to(airplane.current.position, {
+      duration: 1,
+      z: -1000,
+    });
   }, [])
+
+  useEffect(() => {
+    if (snap.play) {
+      planeInTl.current.play();
+    }
+  }, [snap.play]);
+
+  
+
+  // useEffect(() => {
+  //   if (end) {
+  //     state.isEnd = true;
+  //   }
+  // }, [end]);
+
+  
 
   return (
     <>
       <directionalLight position={[0, 3, 1]} intensity={0.5} />
 
-      {/* PLANE/DUCK */}
+      {/* PLANE */}
 
       {/* <OrbitControls enableZoom={false} /> */}
       <group ref={cameraGroup}>
@@ -471,11 +547,22 @@ export const Experience = () => {
           color="white"
           anchorX={"left"}
           anchorY={"middle"}
-          fontSize={0.22}
+          fontSize={0.4}
           maxWidth={2.5}
         >
-          SEWP WORLD HQ {"\n"}
           Home of the Government's Premier IT Contract
+        </Text>
+      </group>
+
+      <group position={[-0.5, -1, -3]}>
+        <Text
+          color="white"
+          anchorX={"left"}
+          anchorY={"middle"}
+          fontSize={0.1}
+          maxWidth={2.5}
+        >
+          scroll to begin
         </Text>
       </group>
 
