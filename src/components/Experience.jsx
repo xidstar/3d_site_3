@@ -265,7 +265,7 @@ export const Experience = () => {
       {
         cameraRailDist: 1.5,
         position: new THREE.Vector3(
-          curvePoints[1].x + 2,
+          curvePoints[1].x + 1.5,
           curvePoints[1].y,
           curvePoints[1].z
         ),
@@ -285,7 +285,7 @@ export const Experience = () => {
       {
         cameraRailDist: 1.5,
         position: new THREE.Vector3(
-          curvePoints[3].x + 2,
+          curvePoints[3].x + 1.5,
           curvePoints[3].y,
           curvePoints[3].z
         ),
@@ -295,7 +295,7 @@ export const Experience = () => {
       {
         cameraRailDist: 1.5,
         position: new THREE.Vector3(
-          curvePoints[4].x + 2,
+          curvePoints[4].x + 1.8,
           curvePoints[4].y,
           curvePoints[4].z
         ),
@@ -305,7 +305,7 @@ export const Experience = () => {
       {
         cameraRailDist: 1.5,
         position: new THREE.Vector3(
-          curvePoints[5].x + 2,
+          curvePoints[5].x + 1.5,
           curvePoints[5].y,
           curvePoints[5].z
         ),
