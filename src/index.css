@@ -182,6 +182,10 @@ body {
   font-size: 3rem;
 }
 
+.pagelink:hover {
+  cursor: pointer;
+}
+
 /* RESPONSIVE */
 
 @media screen and (max-width: 768px) {

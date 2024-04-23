@@ -9,13 +9,13 @@ const Overlay = () => {
 
     const loadPage = () => {
         state.play = true;
-        return state.isPlaying = true;
+        return state.isPlaying = false;
     }
 
     return (
         <>
             {
-                !snap.isPlaying && (
+                snap.isPlaying && (
                     <div className="overlay">
                         <div className="intro">
                             <h1 className="logo">SEWP WORLD HQ</h1>

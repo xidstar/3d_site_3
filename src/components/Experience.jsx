@@ -26,7 +26,6 @@ const FRICTION_DISTANCE = 42;
 
 export const Experience = () => {
   const snap = useSnapshot(state);
-  const [play, setPlay] = useState(false);
 
   const curvePoints = useMemo(() => [
       new THREE.Vector3(0, 0, 0),
@@ -315,6 +314,8 @@ export const Experience = () => {
     ]
   })
 
+  // Outro scene
+
   useFrame((_state, delta) => {
 
     const scrollOffset = Math.max(0, scroll.offset)
@@ -508,14 +509,6 @@ export const Experience = () => {
 
   
 
-  // useEffect(() => {
-  //   if (end) {
-  //     state.isEnd = true;
-  //   }
-  // }, [end]);
-
-  
-
   return (
     <>
       <directionalLight position={[0, 3, 1]} intensity={0.5} />
@@ -567,7 +560,9 @@ export const Experience = () => {
       </group>
 
       {textSections.map((textSection, index) => (
-        <TextSection {...textSection} key={index} />
+        <mesh onClick={() => window.location.href = '/foo'} key={index} className="pagelink">
+          <TextSection {...textSection} />
+        </mesh>
       ))}
       
       {/* LINE */}
