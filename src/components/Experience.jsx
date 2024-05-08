@@ -27,6 +27,8 @@ const FRICTION_DISTANCE = 42;
 export const Experience = () => {
   const snap = useSnapshot(state);
 
+  // Create a smooth 3d spline curve
+
   const curvePoints = useMemo(() => [
       new THREE.Vector3(0, 0, 0),
       new THREE.Vector3(0, 0, -CURVE_DISTANCE),
@@ -50,6 +52,9 @@ export const Experience = () => {
     return curve.getPoints(LINE_NB_POINTS)
   }, [curve])
 
+
+  //Cloud Positions
+
   const clouds = useMemo(
     () => [
       // STARTING
@@ -63,14 +68,14 @@ export const Experience = () => {
         rotation: new THREE.Euler(-Math.PI / 5, Math.PI / 6, 0),
       },
       // FIRST POINT
-      // {
-      //   scale: new THREE.Vector3(2, 2, 2),
-      //   position: new THREE.Vector3(
-      //     curvePoints[1].x + 10,
-      //     curvePoints[1].y - 4,
-      //     curvePoints[1].z + 64
-      //   ),
-      // },
+      {
+        scale: new THREE.Vector3(2, 2, 2),
+        position: new THREE.Vector3(
+          curvePoints[1].x + 10,
+          curvePoints[1].y - 4,
+          curvePoints[1].z + 64
+        ),
+      },
       {
         scale: new THREE.Vector3(1.5, 1.5, 1.5),
         position: new THREE.Vector3(
@@ -268,8 +273,8 @@ export const Experience = () => {
           curvePoints[1].y,
           curvePoints[1].z
         ),
-        title: `Training & Events`,
-        subtitle: `- Visit Site -`,
+        title: `Marketplace & Aquisition Tools`,
+        subtitle: `Search, Buy or Request`,
       },
       {
         cameraRailDist: -1,
@@ -278,8 +283,8 @@ export const Experience = () => {
           curvePoints[2].y,
           curvePoints[2].z
         ),
-        title: `Storefront & Aquisition Tools`,
-        subtitle: `- Visit Site -`,
+        title: `Contract Holders & Industry Providers`,
+        subtitle: `Our Sources of Supply`,
       },
       {
         cameraRailDist: 1.5,
@@ -288,8 +293,8 @@ export const Experience = () => {
           curvePoints[3].y,
           curvePoints[3].z
         ),
-        title: `Contract Holders & Industry Providers`,
-        subtitle: `- Visit Site -`,
+        title: `Procurement Policy & Regulation`,
+        subtitle: `SEWP SOW, Clauses & Supply Chain Info`,
       },
       {
         cameraRailDist: 1.5,
@@ -299,7 +304,7 @@ export const Experience = () => {
           curvePoints[4].z
         ),
         title: `About SEWP`,
-        subtitle: `- Visit Site -`,
+        subtitle: `Latest News and History of the Program`,
       },
       {
         cameraRailDist: 1.5,
@@ -308,18 +313,42 @@ export const Experience = () => {
           curvePoints[5].y,
           curvePoints[5].z
         ),
-        title: `Procurement Policy & Regulation`,
-        subtitle: `- Visit Site -`,
+        title: `Training & Events`,
+        subtitle: `Learn more about the SEWP Contract`,
       },
     ]
   })
 
-  // Outro scene
+  // Scroll distance between text sections
 
   useFrame((_state, delta) => {
 
-    const scrollOffset = Math.max(0, scroll.offset)
+    let scrollOffset = Math.max(0, scroll.offset)
+    
+    if(scrollOffset > 0) {
+      scrollOffset = scrollOffset + 0.139;
+    }
 
+    if(scrollOffset > 0.15) {
+      scrollOffset = scrollOffset + 0.135;
+    }
+
+    if(scrollOffset > 0.293) {
+      scrollOffset = scrollOffset + 0.133;
+    }
+
+    if(scrollOffset > 0.440) {
+      scrollOffset = scrollOffset + 0.128;
+    }
+
+    if(scrollOffset > 0.589) {
+      scrollOffset = scrollOffset + 0.129;
+    }
+
+    if(scrollOffset > 0.719) {
+      scrollOffset = scrollOffset + 0.234;
+    }
+    
     if(snap.isEnd) {
       state.isEnd = true;
       <Outro />
@@ -330,8 +359,9 @@ export const Experience = () => {
 
     
 
-    let friction = 1;
+    let friction = 4;
     let resetCameraRail = true;
+    
     // separate scroll sections
     textSections.forEach((textSection) => {
       const distance = textSection.position.distanceTo(cameraGroup.current.position);
@@ -507,6 +537,9 @@ export const Experience = () => {
     }
   }, [snap.play]);
 
+  useEffect(() => {
+    document.body.style.cursor = state.isHovered ? 'pointer' : 'auto'
+  }, [snap.isHovered])
   
 
   return (
@@ -560,8 +593,16 @@ export const Experience = () => {
       </group>
 
       {textSections.map((textSection, index) => (
-        <mesh onClick={() => window.location.href = '/foo'} key={index} className="pagelink">
-          <TextSection {...textSection} />
+        <mesh 
+          onClick={() => window.location.href = '/foo'} 
+          key={index} 
+          className="pagelink"
+          onPointerOver={() => state.isHovered = true}
+          onPointerOut={() => state.isHovered = false}
+        >
+         
+            <TextSection {...textSection} />
+          
         </mesh>
       ))}
       
